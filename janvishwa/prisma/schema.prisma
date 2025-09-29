@@ -1,0 +1,309 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Core user management
+model User {
+  id            String   @id @default(cuid())
+  clerkUserId   String   @unique
+  email         String   @unique
+  userType      UserType @default(INDIVIDUAL)
+  firstName     String?
+  lastName      String?
+  phone         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relationships
+  individualProfile IndividualProfile?
+  ngoProfile       NgoProfile?
+  donations        Donation[]
+  volunteerRecords VolunteerRecord[]
+  activities       Activity[]
+
+  @@map("users")
+}
+
+model IndividualProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  impactScore       Int      @default(0)
+  totalDonations    Decimal  @default(0)
+  totalVolunteerHours Int    @default(0)
+  address           String?
+  city              String?
+  state             String?
+  pincode           String?
+  skills            String[] // Array of skills
+  interests         String[] // Array of cause interests
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("individual_profiles")
+}
+
+model NgoProfile {
+  id                    String           @id @default(cuid())
+  userId                String           @unique
+  organizationName      String           @unique
+  registrationNumber    String           @unique
+  taxId                 String?
+  causeCategories       CauseCategory[]
+  description           String?
+  website               String?
+  contactPerson         String
+  contactEmail          String
+  contactPhone          String
+  address               String
+  city                  String
+  state                 String
+  pincode               String
+  latitude              Float?
+  longitude             Float?
+  verificationStatus    VerificationStatus @default(PENDING)
+  verifiedAt            DateTime?
+  documentsUploaded     Boolean          @default(false)
+  bankAccountNumber     String?
+  bankIFSCCode         String?
+  bankAccountName      String?
+  totalDonationsReceived Decimal        @default(0)
+  totalVolunteers       Int             @default(0)
+  beneficiariesServed   Int             @default(0)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  user                  User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verificationDocuments VerificationDocument[]
+  needs                 Need[]
+  donations             Donation[]
+  volunteerOpportunities VolunteerOpportunity[]
+  activities            Activity[]
+
+  @@map("ngo_profiles")
+}
+
+model VerificationDocument {
+  id                String           @id @default(cuid())
+  ngoProfileId      String
+  documentType      DocumentType
+  fileName          String
+  fileUrl           String
+  fileSize          Int
+  uploadedAt        DateTime         @default(now())
+  verificationStatus DocumentVerificationStatus @default(PENDING)
+  verifiedAt        DateTime?
+  rejectionReason   String?
+
+  ngoProfile NgoProfile @relation(fields: [ngoProfileId], references: [id], onDelete: Cascade)
+
+  @@map("verification_documents")
+}
+
+model Need {
+  id              String     @id @default(cuid())
+  ngoProfileId    String
+  title           String
+  description     String
+  category        NeedCategory
+  priority        Priority   @default(MEDIUM)
+  itemsNeeded     String[]   // Array of specific items
+  quantityNeeded  Int?
+  quantityFulfilled Int      @default(0)
+  targetAmount    Decimal?
+  amountRaised    Decimal    @default(0)
+  deadline        DateTime?
+  isActive        Boolean    @default(true)
+  isUrgent        Boolean    @default(false)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  ngoProfile NgoProfile @relation(fields: [ngoProfileId], references: [id], onDelete: Cascade)
+  donations  Donation[]
+
+  @@map("needs")
+}
+
+model Donation {
+  id              String        @id @default(cuid())
+  userId          String
+  ngoProfileId    String
+  needId          String?
+  donationType    DonationType
+  itemDescription String?
+  quantity        Int?
+  monetaryAmount  Decimal?
+  estimatedValue  Decimal?
+  status          DonationStatus @default(PENDING)
+  pickupAddress   String?
+  pickupScheduled DateTime?
+  deliveredAt     DateTime?
+  message         String?
+  isAnonymous     Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ngoProfile NgoProfile @relation(fields: [ngoProfileId], references: [id], onDelete: Cascade)
+  need       Need?      @relation(fields: [needId], references: [id], onDelete: SetNull)
+
+  @@map("donations")
+}
+
+model VolunteerOpportunity {
+  id              String     @id @default(cuid())
+  ngoProfileId    String
+  title           String
+  description     String
+  skillsRequired  String[]
+  location        String
+  startDate       DateTime
+  endDate         DateTime?
+  hoursRequired   Int?
+  maxVolunteers   Int?
+  currentVolunteers Int      @default(0)
+  isActive        Boolean    @default(true)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  ngoProfile       NgoProfile       @relation(fields: [ngoProfileId], references: [id], onDelete: Cascade)
+  volunteerRecords VolunteerRecord[]
+
+  @@map("volunteer_opportunities")
+}
+
+model VolunteerRecord {
+  id                      String               @id @default(cuid())
+  userId                  String
+  volunteerOpportunityId  String
+  status                  VolunteerStatus      @default(APPLIED)
+  appliedAt              DateTime             @default(now())
+  approvedAt             DateTime?
+  startedAt              DateTime?
+  completedAt            DateTime?
+  hoursLogged            Int                  @default(0)
+  feedback               String?
+  rating                 Int?                 // 1-5 rating
+  certificate            String?              // URL to certificate
+
+  user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  volunteerOpportunity   VolunteerOpportunity @relation(fields: [volunteerOpportunityId], references: [id], onDelete: Cascade)
+
+  @@map("volunteer_records")
+}
+
+model Activity {
+  id           String       @id @default(cuid())
+  userId       String
+  ngoProfileId String?
+  activityType ActivityType
+  title        String
+  description  String
+  metadata     Json?        // Flexible data storage
+  createdAt    DateTime     @default(now())
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ngoProfile NgoProfile? @relation(fields: [ngoProfileId], references: [id], onDelete: SetNull)
+
+  @@map("activities")
+}
+
+// Enums
+enum UserType {
+  INDIVIDUAL
+  NGO
+  ADMIN
+}
+
+enum CauseCategory {
+  EDUCATION
+  HEALTHCARE
+  ENVIRONMENT
+  POVERTY_ALLEVIATION
+  WOMEN_EMPOWERMENT
+  CHILD_WELFARE
+  ELDERLY_CARE
+  DISASTER_RELIEF
+  ANIMAL_WELFARE
+  SKILL_DEVELOPMENT
+}
+
+enum VerificationStatus {
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+enum DocumentType {
+  REGISTRATION_CERTIFICATE
+  TAX_EXEMPTION_80G
+  TAX_EXEMPTION_12A
+  PAN_CARD
+  BANK_VERIFICATION
+  AUTHORIZED_SIGNATORY
+  ANNUAL_REPORT
+}
+
+enum DocumentVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum NeedCategory {
+  FOOD
+  CLOTHING
+  BOOKS_STATIONERY
+  MEDICAL_SUPPLIES
+  EQUIPMENT
+  MONETARY
+  VOLUNTEERS
+  SKILLS
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum DonationType {
+  ITEM
+  MONETARY
+  SERVICE
+}
+
+enum DonationStatus {
+  PENDING
+  APPROVED
+  IN_TRANSIT
+  DELIVERED
+  COMPLETED
+  CANCELLED
+}
+
+enum VolunteerStatus {
+  APPLIED
+  APPROVED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum ActivityType {
+  DONATION_MADE
+  VOLUNTEER_APPLIED
+  VOLUNTEER_COMPLETED
+  NGO_SUPPORTED
+  NEED_FULFILLED
+  PROFILE_UPDATED
+  VERIFICATION_SUBMITTED
+}
