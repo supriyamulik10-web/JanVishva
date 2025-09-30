@@ -1,0 +1,25 @@
+{
+  "pages": {
+    "/dashboard/page": [
+      "static/chunks/8fab5_next_dist_4615ae44._.js",
+      "static/chunks/janvishwa_app_favicon_ico_mjs_8c7212f9._.js",
+      "static/chunks/8fab5_@clerk_nextjs_dist_esm_app-router_client_keyless-creator-reader_95f78fbe.js",
+      "static/chunks/8fab5_bf8c6a37._.js",
+      "static/chunks/[root-of-the-server]__482b7fe8._.js",
+      "static/chunks/[root-of-the-server]__5067a35d._.css",
+      "static/chunks/janvishwa_app_layout_tsx_4e6e326c._.js",
+      "static/chunks/8fab5_next_dist_client_components_builtin_global-error_98325b94.js",
+      "static/chunks/8fab5_d9287e98._.js",
+      "static/chunks/janvishwa_app_dashboard_page_tsx_98325b94._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_710d5757._.js",
+      "static/chunks/8fab5_next_dist_compiled_react-dom_9b538f93._.js",
+      "static/chunks/8fab5_next_dist_compiled_next-devtools_index_3364f5f5.js",
+      "static/chunks/8fab5_next_dist_compiled_f8a57a86._.js",
+      "static/chunks/8fab5_next_dist_client_f7299422._.js",
+      "static/chunks/8fab5_next_dist_c5c89258._.js",
+      "static/chunks/8fab5_@swc_helpers_cjs_600539d6._.js",
+      "static/chunks/janvishwa_a0ff3932._.js",
+      "static/chunks/turbopack-janvishwa_3ee61538._.js"
+    ]
+  }
+}

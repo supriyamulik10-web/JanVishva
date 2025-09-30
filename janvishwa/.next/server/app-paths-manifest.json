@@ -1,0 +1,11 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/onboarding/individual/route": "app/api/onboarding/individual/route.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/onboarding/individual/page": "app/onboarding/individual/page.js",
+  "/page": "app/page.js",
+  "/select-user-type/page": "app/select-user-type/page.js",
+  "/sign-up/[[...sign-up]]/page": "app/sign-up/[[...sign-up]]/page.js",
+  "/sign-up/verify-email-address/page": "app/sign-up/verify-email-address/page.js"
+}
