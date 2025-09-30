@@ -42,7 +42,10 @@ export default function SignUpPage() {
             unsafeMetadata={{
               userType: isNgo ? 'NGO' : 'INDIVIDUAL'
             }}
-            forceRedirectUrl={isNgo ? '/onboarding/ngo/step-1' : '/onboarding/individual'}
+            afterSignUpUrl={isNgo ? '/onboarding/ngo/step-1' : '/onboarding/individual'}
+  // also keep forceRedirectUrl for immediate sign-ups
+  forceRedirectUrl={isNgo ? '/onboarding/ngo/step-1' : '/onboarding/individual'}
+
           />
         </div>
 

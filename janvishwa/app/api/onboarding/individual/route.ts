@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   try {
     const data = await request.json()
 
-    // Check if user already exists by clerkUserId or email
+    // Check if user already exists
     let user = await prisma.user.findFirst({
       where: {
         OR: [
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     })
 
     if (!user) {
-      // Create new individual user
+      // Create new user
       user = await prisma.user.create({
         data: {
           clerkUserId: data.clerkUserId,
@@ -44,17 +44,16 @@ export async function POST(request: Request) {
         }
       })
     } else {
-      // User exists - update user info
+      // Update existing user
       user = await prisma.user.update({
         where: { id: user.id },
         data: {
           firstName: data.firstName,
           lastName: data.lastName,
           phone: data.phone || null,
-          userType: 'INDIVIDUAL', // Ensure userType is set
+          userType: 'INDIVIDUAL',
           individualProfile: user.individualProfile
             ? {
-                // Profile exists - update it
                 update: {
                   address: data.address || null,
                   city: data.city || null,
@@ -65,7 +64,6 @@ export async function POST(request: Request) {
                 }
               }
             : {
-                // Profile doesn't exist - create it
                 create: {
                   address: data.address || null,
                   city: data.city || null,
@@ -86,7 +84,11 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error creating/updating user:', error)
     return NextResponse.json(
-      { success: false, error: 'Failed to create or update user', details: error instanceof Error ? error.message : 'Unknown error' }, 
+      { 
+        success: false, 
+        error: 'Failed to create or update user', 
+        details: error instanceof Error ? error.message : 'Unknown error' 
+      }, 
       { status: 500 }
     )
   }
