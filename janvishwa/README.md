@@ -31,8 +31,6 @@ JanVishva enables individuals to donate items, skills, and volunteer time direct
 - **In-app Messaging**: Direct communication between donors and NGOs
 - **Trust & Verification**: NGO verification system with trust scores
 - **Impact Tracking**: Monitor your contribution metrics
-  ![Uploading image.png…]()
-
 
 ## Tech Stack
 
